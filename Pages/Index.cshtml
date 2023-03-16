@@ -1,0 +1,66 @@
+﻿@page
+@inject IOptions<OctoGraphOptions> Settings
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.Extensions.Options
+@using OctoGraph.Models
+@model IndexModel
+@{
+    ViewData["Title"] = "Main";
+}
+
+@section Scripts
+{
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    
+    <script type="text/javascript">
+    loadKey(document.getElementById("key"));
+    loadOctopiDropdown();
+    
+    var elements = document.getElementsByClassName("loadGraphOnChange");
+    Array.from(elements).forEach(function (element) {
+        element.addEventListener("change", loadGraph, false);
+    });
+    refreshButton = document.getElementById('refreshButton');
+    refreshButton.addEventListener('click', loadGraph, false);
+    refreshButton.forceCacheRefresh = true;
+    </script>
+}
+
+<div id="loading"></div>
+<div id="controls">
+    @if (Settings.Value.AuthenticationEnabled)
+    {
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            <span>Hello @User.Identity?.Name!</span>
+            <span>
+                <a class="nav-link text-dark" asp-area="MicrosoftIdentity" asp-controller="Account" asp-action="SignOut">Sign out</a>
+            </span>
+        }
+        else
+        {
+            <span>
+                <a class="nav-link text-dark" asp-area="MicrosoftIdentity" asp-controller="Account" asp-action="SignIn">Sign in</a>
+            </span>
+        }
+    }
+    <form>
+        <div>
+            <label for="envSelectList">Octopus Server:</label>
+            <select name="envSelectList" id="envSelectList" class="loadGraphOnChange">
+            </select>
+            <button type="button" id="refreshButton" disabled="disabled">Refresh</button>
+        </div>
+        <div>
+            <label><input type="checkbox" id="linkSysAdminTeams" class="loadGraphOnChange" /> Link SysAdmin Teams to Project Groups</label>
+        </div>
+        <div>
+            <label><input type="checkbox" id="showUsers" checked="checked" class="loadGraphOnChange" /> Show Users</label>
+        </div>
+        <div>
+            <label><input type="checkbox" id="showSpaces" checked="checked" class="loadGraphOnChange" /> Show Spaces</label>
+        </div>
+    </form>
+    <div id="key"></div>
+</div>
+<div id="mynetwork"></div>
