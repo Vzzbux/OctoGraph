@@ -20,4 +20,5 @@ Before running it for the first time you will need to:
 
 ## How to Use
 
-Once the application is running within your hosting environment, open a browser to the root of the site and select the desired Octopus Instance from the drop-down menu to load it. This can take a while (~30s) for a large setup. Subsequent loads are cached on the server, according to the CacheTimeoutInMinutes setting. Clicking the "Refresh" button will refresh the cache and reload the graph.
+Once the application is running within your hosting environment, open a browser to the root of the site and select the desired Octopus Instance from the drop-down menu to load it. This can take a while (~30s) for a large setup. Subsequent loads are cached on the server, according to the CacheTimeoutInMinutes setting. Clicking the "Refresh" button will refresh the cache and reload the graph. 
+Double-clicking a node on the diagram will attempt to deep-link you to the appropriate object within Octopus.

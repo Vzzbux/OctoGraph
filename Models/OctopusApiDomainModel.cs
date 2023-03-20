@@ -110,6 +110,8 @@ namespace OctopusVis.OctopusApiDomainModel
     {
         public string Id { get; set; }
         public string Name { get; set; }
+
+        public string Url => $"app#/{Id}/configuration/spaces/{Id}";
     }
 
     public class Machine
@@ -117,6 +119,7 @@ namespace OctopusVis.OctopusApiDomainModel
         public string Id { get; set; }
         public List<string> Roles { get; set; }
         public string Name { get; set; }
+        public string SpaceId { get; set; }
 
         private Uri _url;
         public Uri Uri
@@ -144,6 +147,8 @@ namespace OctopusVis.OctopusApiDomainModel
         public List<string> EnvironmentIds { get; set; }
         public List<DeploymentEnvironment> Environments { get; set; }
         public DeploymentEnvironmentEnum? Environment => DeploymentEnvironment.GetDeploymentEnvironmentEnum(Environments);
+
+        public string Url => $"app#/{SpaceId}/infrastructure/machines/{Id}";
     }
 
     public enum DeploymentEnvironmentEnum
@@ -197,11 +202,14 @@ namespace OctopusVis.OctopusApiDomainModel
     {
         public string Id { get; set; }
         public string ProjectGroupId { get; set; }
+        public string SpaceId { get; set; }
         public string Name { get; set; }
         public Links Links { get; set; }
         public List<string> TargetRoles { get; set; }
         public List<Machine> Machines { get; set; }
         public List<Team> Teams { get; set; }
+
+        public string Url => $"app#/{SpaceId}/projects/{Id}";
     }
 
     public class User
@@ -211,6 +219,7 @@ namespace OctopusVis.OctopusApiDomainModel
         public string DisplayName { get; set; }
         public bool IsActive { get; set; }
         public bool IsService { get; set; }
+        public string Url => $"app#/configuration/users/{Id}";
     }
 
     public class Links
@@ -244,6 +253,7 @@ namespace OctopusVis.OctopusApiDomainModel
         public List<Team> Teams { get; set; } = new List<Team>();
         public List<Team> SysAdminTeams { get; set; } = new List<Team>();
 
+        public string Url => $"app#/{SpaceId}/projectGroups/{Id}";
         public IEnumerable<Team> AllProjectTeams => Teams.Union(Projects.SelectMany(p => p.Teams)).Distinct();
         public IEnumerable<Team> AllTeams => AllProjectTeams.Union(SysAdminTeams).Distinct();
 
@@ -265,6 +275,8 @@ namespace OctopusVis.OctopusApiDomainModel
         public string SpaceId { get; set; }
 
         public bool HasMembers => MemberUsers.Any(u => u.IsActive && !u.IsService) || ExternalSecurityGroups.Any();
+
+        public string Url => SpaceId != null ? $"app#/{SpaceId}/configuration/teams/{Id}" : $"app#/configuration/teams/{Id}";
     }
 
     public class ExternalSecurityGroup

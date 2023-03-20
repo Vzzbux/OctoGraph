@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.Json.Serialization;
 
 namespace OctopusVis.VisNetworkModel
@@ -8,6 +9,7 @@ namespace OctopusVis.VisNetworkModel
     {
         public List<Node> Nodes { get; set; }
         public List<Edge> Edges { get; set; }
+        public string ServiceUrl { get; set; }
     }
 
     public class Node
@@ -24,6 +26,8 @@ namespace OctopusVis.VisNetworkModel
         public string Group { get; set; }
         [JsonPropertyName("title")]
         public string PopupText { get; set; }
+        [JsonPropertyName("url")]
+        public string Url { get; set; }
         //[JsonPropertyName("icon")]
         //public Icon Icon { get; set; }
     }

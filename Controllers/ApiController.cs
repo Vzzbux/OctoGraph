@@ -68,23 +68,23 @@ public class ApiController : Controller
         var nodes = new List<Node>();
         if (showSpaces)
         {
-            nodes.AddRange(octopus.Spaces.Select(s => new Node() { Id = s.Id, Label = s.Name, Shape = "diamond" })
-                .ToList());
+            nodes.AddRange(octopus.Spaces.Select(s => new Node() { Id = s.Id, Label = s.Name, Shape = "diamond", Url = s.Url}));
         }
-        nodes.AddRange(octopus.ProjectGroups.Select(g => new Node() { Id = g.Id, Label = g.Name, Shape = "circle" }).ToList());
-        nodes.AddRange(octopus.ProjectGroups.SelectMany(g => g.Projects).Select(g => new Node() { Id = g.Id, Label = g.Name, Group = g.ProjectGroupId, Shape = "ellipse" }).ToList());
+        nodes.AddRange(octopus.ProjectGroups.Select(g => new Node() { Id = g.Id, Label = g.Name, Shape = "circle", Url = g.Url }).ToList());
+        nodes.AddRange(octopus.ProjectGroups.SelectMany(g => g.Projects).Select(g => new Node() { Id = g.Id, Label = g.Name, Group = g.ProjectGroupId, Shape = "ellipse", Url = g.Url }).ToList());
         nodes.AddRange(octopus.Machines.Select(m => new Node()
         {
             Id = m.Id,
             Label = m.Name,
             Group = m.Environment?.ToString().ToLower(),
-            PopupText = $"Hostname:{m.Hostname}\r\nAliases:{string.Join("; ", m.Aliases)}\r\nEnvironments: {string.Join(", ", m.Environments.Select(e => e.Name))}\r\nRoles: {string.Join(", ", m.Roles)}"
+            PopupText = $"Hostname:{m.Hostname}\r\nAliases:{string.Join("; ", m.Aliases)}\r\nEnvironments: {string.Join(", ", m.Environments.Select(e => e.Name))}\r\nRoles: {string.Join(", ", m.Roles)}",
+            Url = m.Url
         }).ToList());
-        nodes.AddRange(octopus.Teams.Where(t => t.HasMembers).Select(g => new Node() { Id = g.Id, Label = g.Name, Group = "teams" }).ToList());
+        nodes.AddRange(octopus.Teams.Where(t => t.HasMembers).Select(g => new Node() { Id = g.Id, Label = g.Name, Group = "teams", Url = g.Url }).ToList());
         if (showUsers)
         {
             nodes.AddRange(octopus.Users.Where(t => t.IsActive && !t.IsService).Select(t =>
-                new Node() { Id = t.Id, Label = t.DisplayName, Group = "users" }));
+                new Node() { Id = t.Id, Label = t.DisplayName, Group = "users", Url = t.Url }));
         }
 
         //** EDGES **
@@ -139,7 +139,8 @@ public class ApiController : Controller
         return new RootObjectWrapper()
         {
             Nodes = nodes,
-            Edges = edges
+            Edges = edges,
+            ServiceUrl = octopus.ServiceUrl.ToString(),
         };
     }
 }

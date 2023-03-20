@@ -137,26 +137,32 @@ var networkGroups = {
             }
        };
 
+var mainnodes;
+var serviceUrl;
 function initGraph(dataWrapper) {
+    serviceUrl = dataWrapper.serviceUrl;
+
     // create an array with nodes
-    var nodes = new vis.DataSet(dataWrapper.nodes);
+    mainnodes = new vis.DataSet(dataWrapper.nodes);
     // create an array with edges
     var edges = new vis.DataSet(dataWrapper.edges);
-
+    
     // create a network
     var container = document.getElementById('mynetwork');
 
     // provide the data in the vis format
     var data = {
-        nodes: nodes,
+        nodes: mainnodes,
         edges: edges
     };
     var options = {
         layout: { improvedLayout: true },
-        //interaction: { hover: true },
-        keyboard: {
-            enabled: true,
-        },
+        interaction: { 
+            keyboard: {
+                enabled: true,
+            },
+            //hover: true 
+        },        
         groups: networkGroups        
     };
 
@@ -177,6 +183,7 @@ function initGraph(dataWrapper) {
                 network.once("afterDrawing", () => {
                     container.style.height = '100vh';                    
                 });
+                network.on("doubleClick", doubleClickMain); 
             })
             .catch(
                 console.error.bind(
@@ -187,27 +194,28 @@ function initGraph(dataWrapper) {
     }
 }
 
-function loadKey(container) {  
-    nodes = [
-        { id: 1, label: "Space", shape: "diamond" },
-        { id: 2, label: "Project Group", shape: "circle" },
-        { id: 3, label: "Project", shape: "ellipse" },
-        { id: 4, label: "Team", group: "teams"},
-        { id: 5, label: "User", group: "users"},
+var keynodes;
+function loadKey(container) {      
+    keynodes =  new vis.DataSet([
+        { id: 1, label: "Space", shape: "diamond", url: "https://octopus.com/docs/administration/spaces" },
+        { id: 2, label: "Project Group", shape: "circle", url: "https://octopus.com/docs/getting-started/best-practices/project-and-project-groups" },
+        { id: 3, label: "Project", shape: "ellipse", url: "https://octopus.com/docs/projects" },
+        { id: 4, label: "Team", group: "teams", url: "https://octopus.com/docs/security/users-and-teams"},
+        { id: 5, label: "User", group: "users",  url: "https://octopus.com/docs/security/users-and-teams"},
         { id: 6, label: "Production", group: "production"},
         { id: 7, label: "PreProduction", group: "preproduction"},
         { id: 8, label: "Development", group: "development"},
-        { id: 9, label: "Other", group: "other"}];
+        { id: 9, label: "Other", group: "other"}]);
 
-    var edges = [];
-    for (let i = 1; i < nodes.length; i++) { 
+    var edges = new vis.DataSet({});
+    for (let i = 1; i < keynodes.length; i++) { 
         if (i % 5 != 0) {
-            edges.push({"from": i,"to": i+1,"color": "rgba(0, 0, 0, 0)"});
+            edges.add({"from": i,"to": i+1,"color": "rgba(0, 0, 0, 0)"});
         }
     }
 
     var data = {
-        nodes: nodes,
+        nodes: keynodes,
         edges: edges,
     };
     var options = {
@@ -220,7 +228,7 @@ function loadKey(container) {
             },
         },
         physics: { enabled: false },
-        interaction: { dragNodes: false, dragView: false, zoomView: false, selectable: false, selectConnectedEdges: false, hoverConnectedEdges: false},
+        interaction: { dragNodes: false, dragView: false, zoomView: false, selectable: true, selectConnectedEdges: false, hoverConnectedEdges: false},
         groups: networkGroups        
     };    
 
@@ -239,7 +247,8 @@ function loadKey(container) {
                 });
                 keynetwork.once("afterDrawing", () => {
                     container.style.height = '200px'
-                })
+                });
+                keynetwork.on("doubleClick", doubleClickKey);                
             })
             .catch(
                 console.error.bind(
@@ -247,7 +256,23 @@ function loadKey(container) {
                     "Failed to render the network with Font Awesome 5."
                 )
             );
-    }
-
-    
+    }    
 }
+
+function doubleClickMain(evt) {
+    doubleClick(evt, mainnodes, serviceUrl);
+}
+
+function doubleClickKey(evt) {
+    doubleClick(evt, keynodes, "");
+}
+
+function doubleClick(evt, nodes, service) {    
+    if (evt.nodes.length === 1) {
+        var node = nodes.get(evt.nodes[0]);
+        if (node.url != null) {
+            window.open(service + node.url, '_blank');
+        }
+    }
+}
+
